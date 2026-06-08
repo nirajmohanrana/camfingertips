@@ -1,0 +1,310 @@
+.hand-tracker {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: #000;
+}
+
+.hand-tracker__video {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.hand-tracker__canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scaleX(-1);
+  pointer-events: none;
+}
+
+.hand-tracker__overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: rgba(0, 0, 0, 0.75);
+  color: #fff;
+  font-family: system-ui, sans-serif;
+  text-align: center;
+  padding: 1.5rem;
+}
+
+.hand-tracker__overlay--error {
+  background: rgba(40, 0, 0, 0.85);
+}
+
+.hand-tracker__error-detail {
+  font-size: 0.9rem;
+  opacity: 0.8;
+  max-width: 28rem;
+}
+
+.hand-tracker__controls {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 10;
+  width: min(18rem, calc(100vw - 2rem));
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
+  padding: 0.9rem 1rem;
+  border-radius: 0.75rem;
+  background: rgba(12, 12, 16, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(10px);
+  color: #f3f4f6;
+  font-family: system-ui, sans-serif;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.hand-tracker__controls-title {
+  margin: 0 0 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.hand-tracker__controls-title:not(:first-child) {
+  margin-top: 0.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.hand-tracker__control {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.85rem;
+}
+
+.hand-tracker__control-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.hand-tracker__control-value {
+  font-variant-numeric: tabular-nums;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.hand-tracker__control input[type='range'] {
+  width: 100%;
+  accent-color: #22c55e;
+  cursor: pointer;
+}
+
+.hand-tracker__select {
+  width: 100%;
+  padding: 0.4rem 0.5rem;
+  border-radius: 0.45rem;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background-color: #1a1a22;
+  color: #f3f4f6;
+  font-size: 0.8rem;
+  color-scheme: dark;
+  cursor: pointer;
+}
+
+.hand-tracker__select option {
+  background-color: #1a1a22;
+  color: #f3f4f6;
+}
+
+.hand-tracker__select:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.hand-tracker__accordion {
+  margin-bottom: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.hand-tracker__accordion-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 0.55rem 0.65rem;
+  border: none;
+  background: rgba(255, 255, 255, 0.05);
+  color: #f3f4f6;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+}
+
+.hand-tracker__accordion-header:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.hand-tracker__accordion-icon {
+  font-size: 1rem;
+  line-height: 1;
+  opacity: 0.7;
+}
+
+.hand-tracker__accordion-body {
+  padding: 0.65rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.hand-tracker__toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.hand-tracker__toggle input {
+  accent-color: #22c55e;
+}
+
+.hand-tracker__swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.hand-tracker__swatch {
+  width: 1.4rem;
+  height: 1.4rem;
+  border-radius: 999px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  padding: 0;
+}
+
+.hand-tracker__swatch--active {
+  border-color: #fff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.4);
+}
+
+.hand-tracker__color-input {
+  width: 1.6rem;
+  height: 1.6rem;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.hand-tracker__custom-filters {
+  margin-top: 0.5rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.hand-tracker__subsection-title {
+  margin: 0 0 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.hand-tracker__reset {
+  width: 100%;
+  margin-top: 0.25rem;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 0.45rem;
+  background: rgba(255, 255, 255, 0.06);
+  color: #f3f4f6;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.hand-tracker__reset:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.hand-tracker__cycle-status {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 0.75rem;
+  padding: 0.55rem 0.6rem;
+  border-radius: 0.45rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.hand-tracker__cycle-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.hand-tracker__cycle-pill {
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+  background: rgba(34, 197, 94, 0.18);
+  color: #86efac;
+  font-size: 0.72rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.hand-tracker__control-note {
+  font-size: 0.7rem;
+  color: rgba(134, 239, 172, 0.85);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.hand-tracker__text-input {
+  width: 100%;
+  padding: 0.45rem 0.55rem;
+  border-radius: 0.45rem;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background-color: #1a1a22;
+  color: #f3f4f6;
+  font-size: 0.82rem;
+}
+
+.hand-tracker__text-input:disabled {
+  opacity: 0.55;
+}
+
+.hand-tracker__color-input--wide {
+  width: 100%;
+  height: 2rem;
+}
+
+.perspective-quad-text {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.perspective-quad-text__sr {
+  position: absolute;
+}
