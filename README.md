@@ -1,73 +1,79 @@
-# React + TypeScript + Vite
+# CamFingertips
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A browser-based hand-tracking visualizer that maps live webcam video onto perspective quads between your fingertips. Built with React, TypeScript, and [MediaPipe Hand Landmarker](https://ai.google.dev/edge/mediapipe/solutions/vision/hand_landmarker).
 
-Currently, two official plugins are available:
+Hold your hand in front of the camera and watch filtered video, procedural effects, and perspective text render inside the spaces between adjacent finger tips.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Features
 
-## React Compiler
+- **Real-time hand tracking** — Detects up to two hands via webcam using MediaPipe (GPU-accelerated).
+- **Perspective quads** — Three configurable regions anchored to fingertip landmarks:
+  - Thumb + Index
+  - Index + Middle
+  - Middle + Ring
+- **Visual filters** — 15 presets including Invert, Sepia, Noir, Prism, Neon, Matrix, X-Ray, and a fully customizable filter builder.
+- **Procedural effects** — Canvas-driven effects for TV Static, Glitch, Thermal, and Scanlines that animate in real time.
+- **Perspective text** — Label each quad with text that follows the quad's 3D perspective.
+- **Auto-cycle** — Automatically rotate filter presets on a timer, in sync or staggered across quads. Optional wireframe overlay connects adjacent quads.
+- **Persistent settings** — All controls are saved to `localStorage` and restored on reload.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Requirements
 
-## Expanding the ESLint configuration
+- A modern browser with WebRTC camera access (Chrome, Edge, or Firefox recommended).
+- A webcam.
+- Internet connection on first load (MediaPipe WASM and model assets are fetched from CDN).
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Getting started
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Open the URL shown in the terminal (typically `http://localhost:5173`) and allow camera access when prompted.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Other scripts
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+| Command           | Description              |
+| ----------------- | ------------------------ |
+| `npm run build`   | Type-check and build for production |
+| `npm run preview` | Serve the production build locally  |
+| `npm run lint`    | Run ESLint               |
+
+## Usage
+
+1. Position your hand so all four tracked fingertips (thumb through ring) are visible.
+2. Use the **controls panel** on the right to adjust markers, per-quad filters, borders, text, and auto-cycle behavior.
+3. Toggle quads on/off, change filter presets and strength, or switch to **Custom** to fine-tune blur, brightness, contrast, and more.
+4. Enable **Auto-cycle** to automatically rotate through filter presets every few seconds.
+
+Settings are stored under the key `camfingertips-settings-v2` in `localStorage`.
+
+## Project structure
+
 ```
+src/
+├── components/
+│   ├── HandTracker.tsx      # Camera, MediaPipe loop, canvas rendering
+│   ├── ControlsPanel.tsx    # Settings UI
+│   └── PerspectiveQuadText.tsx
+└── lib/
+    ├── autoCycle.ts         # Filter rotation logic
+    ├── filterPresets.ts     # CSS filter presets
+    ├── proceduralEffects.ts # Canvas procedural effects
+    ├── quadGeometry.ts      # Quad math and drawing
+    ├── perspectiveText.ts   # Perspective-correct text rendering
+    ├── handLandmarks.ts     # MediaPipe landmark indices
+    ├── settingsStorage.ts   # Defaults and localStorage persistence
+    └── types.ts
+```
+
+## Tech stack
+
+- [React](https://react.dev/) 19 + [TypeScript](https://www.typescriptlang.org/)
+- [Vite](https://vite.dev/)
+- [@mediapipe/tasks-vision](https://www.npmjs.com/package/@mediapipe/tasks-vision) — Hand Landmarker
+
+## License
+
+Private project.
