@@ -73,7 +73,9 @@ function drawTextTriangle(
   ctx.textBaseline = 'middle'
   ctx.shadowColor = 'rgba(0, 0, 0, 0.65)'
   ctx.shadowBlur = 6
-  ctx.fillText(text, TEXT_PLANE_WIDTH / 2, TEXT_PLANE_HEIGHT / 2)
+  ctx.translate(TEXT_PLANE_WIDTH / 2, TEXT_PLANE_HEIGHT / 2)
+  ctx.scale(-1, 1)
+  ctx.fillText(text, 0, 0)
   ctx.restore()
 }
 

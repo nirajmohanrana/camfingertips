@@ -1,6 +1,10 @@
 import { CYCLABLE_PRESETS, FILTER_PRESETS } from './filterPresets'
 import type { AppSettings, FilterPresetId } from './types'
 
+const PRESET_INDICES = new Map<FilterPresetId, number>(
+  CYCLABLE_PRESETS.map((preset, index) => [preset, index]),
+)
+
 export function getPresetLabel(presetId: FilterPresetId) {
   return (
     FILTER_PRESETS.find((preset) => preset.id === presetId)?.label ?? presetId
@@ -29,7 +33,7 @@ export function advanceCyclePresets(
   if (mode === 'sync') {
     const firstQuadId = quads[0]?.id
     const currentPreset = firstQuadId ? current[firstQuadId] : CYCLABLE_PRESETS[0]
-    const currentIndex = CYCLABLE_PRESETS.indexOf(currentPreset)
+    const currentIndex = PRESET_INDICES.get(currentPreset) ?? -1
     const nextPreset =
       CYCLABLE_PRESETS[(currentIndex + 1) % CYCLABLE_PRESETS.length]
 
@@ -42,7 +46,7 @@ export function advanceCyclePresets(
 
   for (const quad of quads) {
     const currentPreset = current[quad.id] ?? CYCLABLE_PRESETS[0]
-    const currentIndex = Math.max(0, CYCLABLE_PRESETS.indexOf(currentPreset))
+    const currentIndex = PRESET_INDICES.get(currentPreset) ?? 0
     next[quad.id] =
       CYCLABLE_PRESETS[(currentIndex + 1) % CYCLABLE_PRESETS.length]
   }

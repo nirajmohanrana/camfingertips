@@ -12,6 +12,8 @@ import {
 } from '../lib/autoCycle'
 import { buildFilter } from '../lib/filterPresets'
 import { HIGHLIGHT_TIPS } from '../lib/handLandmarks'
+
+const HIGHLIGHT_TIPS_SET = new Set<number>(HIGHLIGHT_TIPS)
 import {
   drawProceduralEffectInQuad,
   isProceduralPreset,
@@ -25,7 +27,7 @@ import {
 import { drawPerspectiveTextInQuad } from '../lib/perspectiveText'
 import { loadSettings, saveSettings } from '../lib/settingsStorage'
 import type { AppSettings, FilterPresetId, Point2D } from '../lib/types'
-import ControlsPanel from './ControlsPanel'
+import { ControlCenter, LayersPanel } from './ControlsPanel'
 import PerspectiveQuadText from './PerspectiveQuadText'
 import './HandTracker.css'
 
@@ -50,8 +52,33 @@ export default function HandTracker() {
   >(() => buildInitialCyclePresets(loadSettings().quads))
   const activeCyclePresetsRef = useRef(activeCyclePresets)
 
+  const [cameraRequested, setCameraRequested] = useState(false)
+  const [controlsOpen, setControlsOpen] = useState(true)
+  const [layersOpen, setLayersOpen] = useState(true)
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
   const [errorMessage, setErrorMessage] = useState('')
+
+  useEffect(() => {
+    if (typeof navigator !== 'undefined' && navigator.permissions && navigator.permissions.query) {
+      navigator.permissions
+        .query({ name: 'camera' as PermissionName })
+        .then((permissionStatus) => {
+          if (permissionStatus.state === 'granted') {
+            setCameraRequested(true)
+            setStatus('loading')
+          }
+          permissionStatus.onchange = () => {
+            if (permissionStatus.state === 'granted') {
+              setCameraRequested(true)
+              setStatus('loading')
+            }
+          }
+        })
+        .catch((err) => {
+          console.warn('Camera permission query is not fully supported in this browser:', err)
+        })
+    }
+  }, [])
 
   useEffect(() => {
     settingsRef.current = settings
@@ -89,6 +116,8 @@ export default function HandTracker() {
   }, [settings.quads.length])
 
   useEffect(() => {
+    if (!cameraRequested) return
+
     let stream: MediaStream | null = null
     let cancelled = false
 
@@ -280,7 +309,7 @@ export default function HandTracker() {
                 drawingUtilsRef.current.drawLandmarks(landmarks, {
                   color: ({ index }: { index?: number }) =>
                     index !== undefined &&
-                    (HIGHLIGHT_TIPS as readonly number[]).includes(index)
+                    HIGHLIGHT_TIPS_SET.has(index)
                       ? `rgba(255, 0, 0, ${markers.tipOpacity})`
                       : `rgba(255, 0, 0, ${markers.markerOpacity})`,
                   lineWidth: 2,
@@ -329,33 +358,124 @@ export default function HandTracker() {
       drawingUtilsRef.current = null
       stream?.getTracks().forEach((track) => track.stop())
     }
-  }, [])
+  }, [cameraRequested])
 
   return (
     <div className="hand-tracker">
       <video ref={videoRef} className="hand-tracker__video" playsInline muted />
       <canvas ref={canvasRef} className="hand-tracker__canvas" />
 
-      {status === 'loading' && (
-        <div className="hand-tracker__overlay">
-          <p>Loading camera and hand tracking…</p>
+      {!cameraRequested ? (
+        <div className="hand-tracker__landing-screen">
+          <div className="hand-tracker__landing-card">
+            <div className="hand-tracker__landing-badge">✨ Interactive Demo</div>
+            <h1 className="hand-tracker__landing-title">Cam Fingertips</h1>
+            <p className="hand-tracker__landing-subtitle">
+              Experience dynamic, interactive video effects controlled by your hands.
+              Connect fingers in the air to build custom filtered shapes!
+            </p>
+
+            <div className="hand-tracker__landing-features">
+              <div className="hand-tracker__landing-feature">
+                <span className="hand-tracker__landing-feature-icon">📐</span>
+                <div>
+                  <strong>Finger Quads</strong>
+                  <p>Create floating filter zones between your thumb, index, middle, and ring fingers.</p>
+                </div>
+              </div>
+              <div className="hand-tracker__landing-feature">
+                <span className="hand-tracker__landing-feature-icon">🔮</span>
+                <div>
+                  <strong>Procedural Filters</strong>
+                  <p>Tweak Glitch, Thermal, TV Static, and Custom overlays in real-time.</p>
+                </div>
+              </div>
+              <div className="hand-tracker__landing-feature">
+                <span className="hand-tracker__landing-feature-icon">✍️</span>
+                <div>
+                  <strong>Perspective Labels</strong>
+                  <p>Attach dynamic text that moves and rotates in 3D space with your fingers.</p>
+                </div>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              className="hand-tracker__start-btn"
+              onClick={() => setCameraRequested(true)}
+            >
+              <span>📷</span> Enable Camera & Start Demo
+            </button>
+
+            <p className="hand-tracker__landing-privacy">
+              🔒 <strong>Privacy Note:</strong> All hand tracking runs entirely locally in your browser.
+              No camera data is ever sent to a server.
+            </p>
+          </div>
         </div>
+      ) : (
+        <>
+          {status === 'loading' && (
+            <div className="hand-tracker__overlay">
+              <div className="hand-tracker__spinner"></div>
+              <p>Initializing camera & hand model…</p>
+            </div>
+          )}
+
+          {status === 'error' && (
+            <div className="hand-tracker__overlay hand-tracker__overlay--error">
+              <p>Could not access camera</p>
+              <p className="hand-tracker__error-detail">{errorMessage}</p>
+              <button
+                type="button"
+                className="hand-tracker__reset"
+                style={{ width: 'auto', marginTop: '1rem' }}
+                onClick={() => setCameraRequested(false)}
+              >
+                Go Back
+              </button>
+            </div>
+          )}
+
+          <PerspectiveQuadText quads={settings.quads} />
+
+          {controlsOpen ? (
+            <ControlCenter
+              settings={settings}
+              onChange={setSettings}
+              activeCyclePresets={activeCyclePresets}
+              onClose={() => setControlsOpen(false)}
+            />
+          ) : (
+            <button
+              type="button"
+              className="hand-tracker__sidebar-trigger hand-tracker__sidebar-trigger--left"
+              onClick={() => setControlsOpen(true)}
+              title="Expand System Settings"
+            >
+              [⚙ CONFIG_SYS]
+            </button>
+          )}
+
+          {layersOpen ? (
+            <LayersPanel
+              settings={settings}
+              onChange={setSettings}
+              activeCyclePresets={activeCyclePresets}
+              onClose={() => setLayersOpen(false)}
+            />
+          ) : (
+            <button
+              type="button"
+              className="hand-tracker__sidebar-trigger hand-tracker__sidebar-trigger--right"
+              onClick={() => setLayersOpen(true)}
+              title="Expand Shape Layers"
+            >
+              [🎛 SHAPE_LYR]
+            </button>
+          )}
+        </>
       )}
-
-      {status === 'error' && (
-        <div className="hand-tracker__overlay hand-tracker__overlay--error">
-          <p>Could not access camera</p>
-          <p className="hand-tracker__error-detail">{errorMessage}</p>
-        </div>
-      )}
-
-      <PerspectiveQuadText quads={settings.quads} />
-
-      <ControlsPanel
-        settings={settings}
-        onChange={setSettings}
-        activeCyclePresets={activeCyclePresets}
-      />
     </div>
   )
 }

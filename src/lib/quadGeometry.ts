@@ -23,7 +23,7 @@ export function orderQuadPoints(points: Point2D[]): Point2D[] {
   const centerY =
     points.reduce((sum, point) => sum + point.y, 0) / points.length
 
-  return [...points].sort(
+  return points.toSorted(
     (a, b) =>
       Math.atan2(a.y - centerY, a.x - centerX) -
       Math.atan2(b.y - centerY, b.x - centerX),
