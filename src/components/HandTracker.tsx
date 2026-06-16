@@ -112,7 +112,9 @@ export default function HandTracker() {
   ])
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setActiveCyclePresets(buildInitialCyclePresets(settings.quads))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [settings.quads.length])
 
   useEffect(() => {
@@ -249,6 +251,7 @@ export default function HandTracker() {
                     activePreset,
                     quad.filterStrength,
                     frameSeed,
+                    quad.id,
                   )
                 } else {
                   const filter = buildFilter(

@@ -34,6 +34,7 @@ const PRESET_DESCRIPTIONS: Record<FilterPresetId, string> = {
   glitch: 'Digital interference and signal distortion.',
   thermal: 'Infrared heat vision color grading.',
   scanline: 'Horizontal display scanlines with roll.',
+  particleEngine: 'TouchDesigner POP particle volume with orange-blue gradient & neon HUD.',
   custom: 'Manually tweak contrast, saturation, hue, blur, etc.',
 }
 

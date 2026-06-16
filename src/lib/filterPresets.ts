@@ -21,6 +21,7 @@ export const FILTER_PRESETS: FilterPresetOption[] = [
   { id: 'glitch', label: 'Glitch', description: 'Tearing & RGB split' },
   { id: 'thermal', label: 'Thermal', description: 'Heatmap spectrogram' },
   { id: 'scanline', label: 'Scanlines', description: 'CRT rolling bar' },
+  { id: 'particleEngine', label: 'POP Particles', description: 'TouchDesigner POP particle volume with orange-blue gradient & neon HUD' },
   { id: 'custom', label: 'Custom', description: 'Build your own' },
 ]
 
@@ -38,6 +39,7 @@ export const CYCLABLE_PRESETS: FilterPresetId[] = [
   'glitch',
   'thermal',
   'scanline',
+  'particleEngine',
 ]
 
 export const DEFAULT_CUSTOM_FILTER: CustomFilter = {
@@ -86,7 +88,7 @@ function buildCustomFilterString(custom: CustomFilter, strength: number): string
 }
 
 function buildPresetFilterString(
-  preset: Exclude<FilterPresetId, 'custom' | 'tvStatic' | 'glitch' | 'thermal' | 'scanline'>,
+  preset: Exclude<FilterPresetId, 'custom' | 'tvStatic' | 'glitch' | 'thermal' | 'scanline' | 'particleEngine'>,
   strength: number,
 ): string {
   if (strength <= 0) return 'none'
@@ -129,7 +131,8 @@ export function buildFilter(
     preset === 'tvStatic' ||
     preset === 'glitch' ||
     preset === 'thermal' ||
-    preset === 'scanline'
+    preset === 'scanline' ||
+    preset === 'particleEngine'
   ) {
     if (preset === 'custom') {
       return buildCustomFilterString(custom, strength)

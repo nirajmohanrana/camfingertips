@@ -1,16 +1,18 @@
 import { traceQuadPath } from './quadGeometry'
 import type { FilterPresetId, Point2D } from './types'
+import { drawParticleEngine } from './particleEngine'
 
 export const PROCEDURAL_PRESETS: FilterPresetId[] = [
   'tvStatic',
   'glitch',
   'thermal',
   'scanline',
+  'particleEngine',
 ]
 
 export function isProceduralPreset(
   preset: FilterPresetId,
-): preset is 'tvStatic' | 'glitch' | 'thermal' | 'scanline' {
+): preset is 'tvStatic' | 'glitch' | 'thermal' | 'scanline' | 'particleEngine' {
   return PROCEDURAL_PRESETS.includes(preset)
 }
 
@@ -210,11 +212,19 @@ export function drawProceduralEffectInQuad(
   points: Point2D[],
   width: number,
   height: number,
-  preset: 'tvStatic' | 'glitch' | 'thermal' | 'scanline',
+  preset: 'tvStatic' | 'glitch' | 'thermal' | 'scanline' | 'particleEngine',
   strength: number,
   frameSeed: number,
+  quadId: string,
 ) {
-  if (strength <= 0 || points.length !== 4) return
+  if (strength <= 0) return
+
+  if (preset === 'particleEngine') {
+    drawParticleEngine(ctx, video, points, width, height, quadId, strength, frameSeed)
+    return
+  }
+
+  if (points.length !== 4) return
 
   ctx.save()
   traceQuadPath(ctx, points, width, height)

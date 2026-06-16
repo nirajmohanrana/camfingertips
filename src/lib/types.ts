@@ -14,6 +14,7 @@ export type FilterPresetId =
   | 'thermal'
   | 'scanline'
   | 'custom'
+  | 'particleEngine'
 
 export type CustomFilter = {
   blur: number
